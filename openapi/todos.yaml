@@ -1,0 +1,237 @@
+openapi: 3.0.3
+info:
+  title: Todos
+  description: Todos
+  version: 1.0.0
+servers:
+  - url: 'http://127.0.0.1:8080'
+  - url: 'http://localhost:8080'
+paths:
+  /todos:
+    get:
+      summary: Returns a list of todos.
+      description: Returns a list of todos.
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 0
+            default: 0
+        - in: query
+          name: size
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 20
+      responses:
+        '200':
+          description: A JSON array of todos
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    $ref: "#/components/schemas/Page"
+                  _links:
+                    $ref: "#/components/schemas/LinksWithSearch"
+                  _embedded:
+                    type: object
+                    properties:
+                      todos:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Todo"
+    post:
+      summary: Create a todo.
+      description: Create a todo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewTodo"
+      responses:
+        201:
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+  /todos/search/findByTitle:
+    get:
+      summary: Returns a list of todos by title.
+      description: Returns a list of todos by title.
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 0
+            default: 0
+        - in: query
+          name: size
+          required: false
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 20
+        - in: query
+          name: title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON array of todos
+          content:
+            application/hal+json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    $ref: "#/components/schemas/Page"
+                  _links:
+                    $ref: "#/components/schemas/LinksWithSearch"
+                  _embedded:
+                    type: object
+                    properties:
+                      todos:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Todo"
+  /todos/{id}:
+    get:
+      summary: Returns a todo by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+    patch:
+      summary: Returns a todo updated by ID.
+      description: Returns a todo updated by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewTodo"
+      responses:
+        200:
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        404:
+          description: Not found
+    delete:
+      summary: Returns the todo deleted by ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: No content
+        404:
+          description: Not found
+components:
+  schemas:
+    Self:
+      type: object
+      properties:
+        href:
+          type: string
+    Links:
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/Self"
+        profile:
+          type: object
+          properties:
+            href:
+              type: string
+    LinksWithSearch:
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/Self"
+        profile:
+          type: object
+          properties:
+            href:
+              type: string
+        search:
+          type: object
+          properties:
+            href:
+              type: string
+    Page:
+      type: object
+      properties:
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        number:
+          type: integer
+    Todo:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        _links:
+          type: object
+          properties:
+            self:
+              $ref: "#/components/schemas/Self"
+            todo:
+              type: object
+              properties:
+                href:
+                  type: string
+    NewTodo:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
